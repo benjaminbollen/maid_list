@@ -1,0 +1,20 @@
+[package]
+name = "MaidList"
+version = "0.1.0"
+authors = ["dally"]
+
+[dependencies]
+libc = "0.1"  
+glib = "^0"  
+gdk = "^0"  
+gtk = "^0"  
+cairo-rs = "^0"  
+hyper = "*"
+iron = "*"
+router = "*"
+rustc-serialize = "*"
+
+[features]  
+gtk_3_10 = ["gtk/gtk_3_10"]  
+gtk_3_14 = ["gtk/gtk_3_14", "gtk_3_10"]  
+default=["gtk_3_14"]  
