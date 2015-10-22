@@ -13,8 +13,3 @@ hyper = "*"
 iron = "*"
 router = "*"
 rustc-serialize = "*"
-
-[features]  
-gtk_3_10 = ["gtk/gtk_3_10"]  
-gtk_3_14 = ["gtk/gtk_3_14", "gtk_3_10"]  
-default=["gtk_3_14"]  
