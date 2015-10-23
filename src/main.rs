@@ -23,9 +23,9 @@ use iron::prelude::*;
 
 #[derive(RustcDecodable, RustcEncodable)]
 struct SingleData {
-	balance: i32,
-	reserved_balance: i32,
-	address: String,
+    balance: i32,
+    reserved_balance: i32,
+    address: String,
 }
 
 fn append_column(title: &str, v: &mut Vec<gtk::TreeViewColumn>) {
@@ -43,20 +43,24 @@ fn append_column(title: &str, v: &mut Vec<gtk::TreeViewColumn>) {
 
 
 fn main() {
-	gtk::init().unwrap_or_else(|_| panic!("Failed to initialize GTK."));
+    gtk::init().unwrap_or_else(|_| panic!("Failed to initialize GTK."));
 
-	let glade_src = include_str!("maidlist.glade");
+    let glade_src = include_str!("maidlist.glade");
     let builder = Builder::new_from_string(glade_src).unwrap();  
 
-	let sortbutton: gtk::Button = builder.get_object("button1").unwrap();
-	let sortentry: gtk::Entry = builder.get_object("entry1").unwrap();
+    let sortbutton: gtk::Button = builder.get_object("button1").unwrap();
+    let sortentry: gtk::Entry = builder.get_object("entry1").unwrap();
 
-	let clone_send_address_entry = sortentry.clone();
+    let balance_entry: gtk::Entry = builder.get_object("balanceEntry").unwrap();
+    let balance_label: gtk::Label = builder.get_object("balanceLabel").unwrap();
+    let balance_button: gtk::Button = builder.get_object("balanceButton").unwrap();
 
-	
+    let clone_send_address_entry = sortentry.clone();
+
+    
     let window: Window = builder.get_object("window1").unwrap();
     //let search_button: gtk::Button = builder.get_object("name").unwrap();
-	window.set_default_size(600, 420);
+    window.set_default_size(600, 420);
 
     window.set_window_position(gtk::WindowPosition::Center);
 
@@ -94,9 +98,25 @@ fn main() {
     for i in columns {
             another_tree2.append_column(&i);
     }
+    balance_button.connect_clicked(move |_| {
+        let client = Client::new();
+
+        let the_address = balance_entry.get_text().unwrap();
+        let mut results = client.get("https://www.omniwallet.org/v1/mastercoin_verify/addresses?currency_id=3")
+        .header(Connection::close())
+        .send().unwrap();
+        let mut payload = String::new();
+        results.read_to_string(&mut payload).unwrap();
+        let decoded: Vec<SingleData> = json::decode(&payload).unwrap();
+        for thethings in 0..decoded.len() {
+            if decoded[thethings].address == the_address {
+                balance_label.set_text(&decoded[thethings].balance.to_string());
+            }
+        }
+    });
 
     sortbutton.connect_clicked(move |_| {
-		let the_text= clone_send_address_entry.get_text().unwrap();
+        let the_text= clone_send_address_entry.get_text().unwrap();
         let the_number: i32 = the_text.parse().unwrap();
         let client = Client::new();
 
@@ -126,7 +146,7 @@ fn main() {
 
         left_tree.set_model(&the_real_left_model);
         left_tree.set_headers_visible(false);
-	});
+    });
 
 
     // print out when a row is selected
