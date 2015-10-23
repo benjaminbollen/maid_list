@@ -1,5 +1,5 @@
 [package]
-name = "MaidList"
+name = "maid_list"
 version = "0.1.0"
 authors = ["dally"]
 
