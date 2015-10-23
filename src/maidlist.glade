@@ -84,7 +84,7 @@
             </child>
             <child>
               <object class="GtkButton" id="balanceButton">
-                <property name="label" translatable="yes">button</property>
+                <property name="label" translatable="yes">Get balance</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
