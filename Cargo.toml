@@ -4,11 +4,11 @@ version = "0.1.0"
 authors = ["dally"]
 
 [dependencies]
-libc = "0.1"  
-glib = "^0"  
-gdk = "^0"  
-gtk = "^0"  
-cairo-rs = "^0"  
+libc = "*"  
+glib = "*"  
+gdk = "*"  
+gtk = "*"  
+cairo-rs = "*"  
 hyper = "*"
 iron = "*"
 router = "*"
