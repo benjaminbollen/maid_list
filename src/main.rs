@@ -1,25 +1,20 @@
-extern crate hyper;
 extern crate glib;
 extern crate gtk;
 extern crate rustc_serialize;
-extern crate iron;
-extern crate router;
+extern crate curl;
+
+use curl::http;
 
 use gtk::traits::*;
 use gtk::signal::Inhibit;
 use gtk::widgets::Builder;
 use gtk::Window;
-use std::io::Read;
 use std::rc::Rc;
 use std::cell::RefCell;
 
 use rustc_serialize::{Decoder};
 use rustc_serialize::json::{self};
 
-use hyper::Client;
-use hyper::header::Connection;
-
-use iron::prelude::*;
 
 #[derive(RustcDecodable, RustcEncodable)]
 struct SingleData {
@@ -99,15 +94,14 @@ fn main() {
             another_tree2.append_column(&i);
     }
     balance_button.connect_clicked(move |_| {
-        let client = Client::new();
+
+        let resp = http::handle()
+        .get("https://www.omniwallet.org/v1/mastercoin_verify/addresses?currency_id=3")
+        .exec().unwrap();
+        let the_string = std::str::from_utf8(resp.get_body()).unwrap();
+        let decoded: Vec<SingleData> = json::decode(&the_string).unwrap();
 
         let the_address = balance_entry.get_text().unwrap();
-        let mut results = client.get("https://www.omniwallet.org/v1/mastercoin_verify/addresses?currency_id=3")
-        .header(Connection::close())
-        .send().unwrap();
-        let mut payload = String::new();
-        results.read_to_string(&mut payload).unwrap();
-        let decoded: Vec<SingleData> = json::decode(&payload).unwrap();
         for thethings in 0..decoded.len() {
             if decoded[thethings].address == the_address {
                 balance_label.set_text(&decoded[thethings].balance.to_string());
@@ -118,16 +112,14 @@ fn main() {
     sortbutton.connect_clicked(move |_| {
         let the_text= clone_send_address_entry.get_text().unwrap();
         let the_number: i32 = the_text.parse().unwrap();
-        let client = Client::new();
 
-        let mut results = client.get("https://www.omniwallet.org/v1/mastercoin_verify/addresses?currency_id=3")
-        .header(Connection::close())
-        .send().unwrap();
-        let mut payload = String::new();
-        results.read_to_string(&mut payload).unwrap();
+        let resp = http::handle()
+        .get("https://www.omniwallet.org/v1/mastercoin_verify/addresses?currency_id=3")
+        .exec().unwrap();
+        let the_string = std::str::from_utf8(resp.get_body()).unwrap();
+        let decoded: Vec<SingleData> = json::decode(&the_string).unwrap();
         left_storecell_clone.borrow_mut().clear();
         let mut ints = 0;
-        let decoded: Vec<SingleData> = json::decode(&payload).unwrap();
         for thethings in 0..decoded.len() {
             if decoded[thethings].balance > the_number {
                 let mut top_level = gtk::TreeIter::new();
